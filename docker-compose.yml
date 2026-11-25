@@ -20,13 +20,17 @@ services:
       MOODLE_DB_NAME: moodle
       MOODLE_DB_USER: moodleuser
       MOODLE_DB_PASSWORD: moodlepass
-      MOODLE_WWWROOT: http://TU_IP_PUBLICA # El pipeline reemplazará esto
+      MOODLE_WWWROOT: http://TU_IP_PUBLICA
     volumes:
-      - moodle_data:/var/www/moodledata
-    depends_on:
-      - mariadb
+      - moodle_code:/var/www/html
+    command: >
+      bash -c "if [ ! -f /var/www/html/index.php ]; then
+                 git clone -b MOODLE_405_STABLE --depth 1 https://github.com/moodle/moodle.git /var/www/html;
+               fi &&
+               chown -R www-data:www-data /var/www/html &&
+               apache2-foreground"
     restart: always
 
 volumes:
   mariadb_data:
-  moodle_data:
+  moodle_code:
