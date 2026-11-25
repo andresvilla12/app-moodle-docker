@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  mariadb:
+    image: mariadb:10.6
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_seguro
+      MYSQL_DATABASE: moodle
+      MYSQL_USER: moodleuser
+      MYSQL_PASSWORD: moodlepass
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    restart: always
+
+  moodle:
+    image: moodlehq/moodle-php-apache:8.1
+    ports:
+      - "80:80"
+    environment:
+      MOODLE_DB_HOST: mariadb
+      MOODLE_DB_NAME: moodle
+      MOODLE_DB_USER: moodleuser
+      MOODLE_DB_PASSWORD: moodlepass
+      MOODLE_WWWROOT: http://TU_IP_PUBLICA # El pipeline reemplazará esto
+    volumes:
+      - moodle_data:/var/www/moodledata
+    depends_on:
+      - mariadb
+    restart: always
+
+volumes:
+  mariadb_data:
+  moodle_data:
